@@ -1,4 +1,8 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class TexasPoker {
+    public static String Straight = "23456789TJQKA";
     public static String CheckWinner(String Black, String White){
         String result = "";
 
@@ -13,17 +17,20 @@ public class TexasPoker {
     }
 
     public static boolean CheckFlush(String Pks){
-        //判断花色
-        boolean Flush = false;
-
-        return Flush;
+        //判断是否同花
+        char[] suits = GetSuits(Pks);
+        for (int i = 0; i < suits.length; i++)
+            if(suits[i] != suits[0])
+                return false;
+        return true;
     }
 
     public static boolean CheckStraight(String Pks){
         //判断顺子
-        boolean Straight = false;
-
-        return Straight;
+        String values = GetValues(Pks).toString();
+        if (Straight.contains(values))
+            return true;
+        return false;
     }
 
     public static int CheckKinds(String Pks){
@@ -38,5 +45,20 @@ public class TexasPoker {
         int pairs = 0;
 
         return pairs;
+    }
+
+    public static char[] GetSuits(String Pks){
+        char[] suit = new char[5];
+        for (int i = 1, j = 0; i < 15; i += 3, j++)
+            suit[j] = Pks.charAt(i);
+        return suit;
+    }
+
+    public static int[] GetValues(String Pks){
+        int[] values = new int[5];
+        for (int i = 0, j = 0; i < 15; i += 3, j++)
+            values[j] = (int) Pks.charAt(i);
+        Arrays.sort(values);
+        return values;
     }
 }
