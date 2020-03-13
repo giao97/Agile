@@ -5,47 +5,33 @@ public class TexasPoker {
     public static String Straight = "23456789TJQKA";
     public static String CheckWinner(String Black, String White){
         //判断输赢
-        String result = "";
         int black = CheckPokerType(Black), white = CheckPokerType(White);
         if (black > white)
-            result += "Black wins";
+            return "Black wins";
         else if (black < white)
-            result += "White wins";
-        else if (black == white){
-            int blast = Straight.indexOf(Black.charAt(12));
-            int wlast = Straight.indexOf(White.charAt(12));
-            if (black == 0){
-
+            return "White wins";
+        else{
+            if (black == 0 || black == 5){
+                //散牌和同花
+                return CompareBiggest0(Black, White);
             }
-            else if (black == 1){
-
+            else if (black == 1 || black == 2){
+                //对子和两对
+                return CompareBiggest1(black, Black, White);
             }
-            else if (black == 2){
-
-            }
-            else if (black == 3){
-
-            }
-            else if (black == 4){
-                result = CompareBiggest(3, Black, White);
-            }
-            else if (black == 5){
-                result = CompareBiggest(1, Black, White);
-            }
-            else if (black == 6){
-
+            else if (black == 3 || black == 6){
+                //三条和葫芦
+                return CompareBiggest2(3, Black, White);
             }
             else if (black == 7){
-                result = CompareBiggest(3, Black, White);
+                //铁支
+                return CompareBiggest2(4, Black, White);
             }
-            else if (black == 8){
-                result = CompareBiggest(4, Black, White);
-            }
-            else{
-                result = CompareBiggest(1, Black, White);
+            else {
+                //顺子和同花顺
+                return CompareBiggest2(1, Black, White);
             }
         }
-        return result;
     }
 
     public static int CheckPokerType(String Pks){
@@ -149,8 +135,8 @@ public class TexasPoker {
 
     public static char[] GetValues(String Pks){
         //获取五张牌的大小
-        char[] values = new char[5];
-        for (int i = 0, j = 0; i < 15; i += 3, j++)
+        char[] values = new char[(Pks.length() + 1) / 3];
+        for (int i = 0, j = 0; i < Pks.length(); i += 3, j++)
             values[j] = Pks.charAt(i);
         values = PokerSort(values);
         return values;
@@ -172,35 +158,104 @@ public class TexasPoker {
         return values;
     }
 
-    public static char Find_Biggest(int kind, String Pks){
+    public static char FindBiggest(int kind, String Pks){
         //找到相应数量的最大的牌
         char biggest = ' ';
         char[] values = GetValues(Pks);
         int i = values.length - 1;
+        if (i == 0)
+            return values[0];
         int num = 1;
-        for (int j = i - 1; j >= 0; j++){
+        for (int j = i - 1; j >= 0; j--){
             if (values[j] == values[i]){
                 num++;
-                if (num == kind) {
-                    biggest = values[i];
-                    break;
-                }
             }
+            if (num == kind) {
+                biggest = values[i];
+                break;
+            }
+            else
+                i = j;
         }
         return biggest;
     }
 
-    public static String CompareBiggest(int kind, String Black, String White){
-        //输出结果
-        String result = "";
-        int blast = Find_Biggest(kind, Black);
-        int wlast = Find_Biggest(kind, White);
-        if (blast > wlast)
-            result += "Black wins";
-        else if (blast < wlast)
-            result += "White wins";
+    public static String DropBiggest(char Pk, String Pks){
+        //删除相指定的牌
+        String drop = "";
+        for (int i = 0; i < Pks.length(); i++){
+            if (Pks.charAt(i) != Pk)
+                drop += Pks.charAt(i);
+            else
+                i += 2;
+        }
+        return drop;
+    }
+
+    public static String CompareBiggest0(String Black, String White){
+        //比较单牌大小
+        int winner;
+        char black, white;//最大牌面
+        while(Black != "" && White != ""){
+            black = FindBiggest(1, Black);
+            white = FindBiggest(1, White);
+            winner = ComparePokers(black, white);
+            if (winner == 1)
+                return "Black wins";
+            else if (winner == 2)
+                return "White wins";
+            Black = DropBiggest(black, Black);
+            White = DropBiggest(white, White);
+        }
+        return "Tie";
+    }
+
+    public static String CompareBiggest1(int type, String Black, String White){
+        //比较对子大小
+        int winner;
+        char black = FindBiggest(2, Black), white = FindBiggest(2, White);
+        winner = ComparePokers(black, white);
+        if (winner == 1)
+            return "Black wins";
+        else if (winner == 2)
+            return "White wins";
+        else {
+            Black = DropBiggest(black, Black);
+            White = DropBiggest(white, White);
+            if (type == 2){
+                black = FindBiggest(2, Black);
+                white = FindBiggest(2, White);
+                winner = ComparePokers(black, white);
+                if (winner == 1)
+                    return "Black wins";
+                else if (winner == 2)
+                    return "White wins";
+                Black = DropBiggest(black, Black);
+                White = DropBiggest(white, White);
+            }
+            return CompareBiggest0(Black, White);
+        }
+    }
+
+    public static String CompareBiggest2(int kind, String Black, String White){
+        //比较大于2张重复牌及顺子的大小
+        int winner = ComparePokers(FindBiggest(kind, Black), FindBiggest(kind, White));
+        if (winner == 1)
+            return "Black wins";
+        else if (winner == 2)
+            return "White wins";
         else
-            result += "Tie";
-        return result;
+            return "Tie";
+    }
+
+    public static int ComparePokers(char black, char white){
+        //0:平 1:黑胜 2:白胜
+        int B = Straight.indexOf(black), W = Straight.indexOf(white);
+        if (B > W)
+            return 1;
+        else if (B < W)
+            return 2;
+        else
+            return 0;
     }
 }

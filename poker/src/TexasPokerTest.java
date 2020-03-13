@@ -1,7 +1,7 @@
-import org.junit.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class TexasPokerTest {
 
@@ -64,4 +64,25 @@ class TexasPokerTest {
         assertEquals(2, texaspoker.CheckPairs("2H 9D KS 2C KD"));
         assertEquals(1, texaspoker.CheckPairs("2H KS KC KD 2D"));
     }
+
+    @Test
+    void compareBiggest0() {
+        assertEquals("White wins", texaspoker.CheckWinner("2H 3D 5S 9C KD", "2C 3H 4S 8C AH"));
+    }
+
+    @Test
+    void compareBiggest1() {
+        assertEquals("White wins", texaspoker.CheckWinner("2H KD KS 9C 9D", "2C 8H 8S AC AH"));
+        assertEquals("Black wins", texaspoker.CheckWinner("AH 5D 5S 9C AD", "AC 3H 4S 3C AH"));
+        assertEquals("Black wins", texaspoker.CheckWinner("2H KD 3S 9C KD", "2C 4H 8S 8C AH"));
+        assertEquals("White wins", texaspoker.CheckWinner("2H 5D 5S 9C JD", "2C 3H 4S AC AH"));
+        assertEquals("Black wins", texaspoker.CheckWinner("AH 5D 5S 9C AD", "AC 5H 4S 5C AH"));
+    }
+
+    @Test
+    void compareBiggest2() {
+        assertEquals("Black wins", texaspoker.CheckWinner("2H KD KS 9C KD", "2C 8H 8S 8C AH"));
+        assertEquals("White wins", texaspoker.CheckWinner("2H 5D 5S 9C 5D", "AC 3H 4S AC AH"));
+    }
+
 }
