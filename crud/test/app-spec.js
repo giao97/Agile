@@ -10,7 +10,7 @@ const {
   describe("app", () => {
     describe("get request", () => {
       it("should get all tasks when request url pattern is '/tasks'", (done) => {
-        app.locals.dataFilePath = "./test/fixture.json"
+        app.locals.dataFilePath = "./test/testdata.json"
         request(app).get('/tasks').expect(200).expect([{
             "id": 1,
             "content": "Restful API homework",
@@ -51,7 +51,7 @@ const {
             "content": "Restful API homework",
             "createdTime": "2019-05-15T00:00:00Z"
           }
-        ]), "./test/fixture.json")
+        ]), "./test/testdata.json")
       })
       it("should create a task when the corresponding id does not exist in the datasource", (done) => {
         request(app).post('/tasks').send({

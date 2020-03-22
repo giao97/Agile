@@ -33,4 +33,16 @@ exports.createTask = async (req, res) => {
   }
 }
 
+exports.deleteTask = async (req, res) => {
+  const id = req.params.id
+  const file = await asyncReadFile(req.app.locals.dataFilePath)
+  const tasks = JSON.parse(file)
+  const newTasks = tasks.filter(function (e) { return e.id != id; })
+  if (newTasks.length === tasks.length) {
+    res.status(404).send()
+  } else {
+    await asyncWriteFile(JSON.stringify(newTasks), req.app.locals.dataFilePath)
+    res.status(204).send()
+  }
 
+}
